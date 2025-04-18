@@ -1,0 +1,9 @@
+apiVersion: v2
+name: api
+description: A FastAPI backend application
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+maintainers:
+  - name: Evan White
+    email: maintainer@example.localhost

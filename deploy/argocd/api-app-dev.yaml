@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: api-dev
+  namespace: argocd
+spec:
+  project: dev
+  source:
+    repoURL: https://github.com/kindasimple/k8-example.git
+    targetRevision: HEAD
+    path: deploy/api
+    helm:
+      valueFiles:
+        - values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

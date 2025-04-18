@@ -1,0 +1,73 @@
+apiVersion: skaffold/v4beta5
+kind: Config
+metadata:
+  name: k8-react-fastapi
+build:
+  artifacts:
+    - image: example
+      context: ../projects/example
+      docker:
+        dockerfile: Dockerfile
+    - image: example-api
+      context: ../projects/api
+      docker:
+        dockerfile: Dockerfile
+  tagPolicy:
+    sha256: {}
+  local:       # Add this section
+    push: false  # Don't push to registry
+    useDockerCLI: true
+    useBuildkit: true
+
+deploy:
+  helm:
+    releases:
+      - name: example
+        chartPath: example
+        valuesFiles:
+          - example/values/dev-values.yaml
+        setValues:
+          image.repository: example
+          image.pullPolicy: IfNotPresent  # Important for local images
+      - name: example-api
+        chartPath: api
+        valuesFiles:
+          - api/values/dev-values.yaml
+        setValues:
+          image.repository: example-api
+          image.pullPolicy: IfNotPresent  # Important for local images
+
+profiles:
+  - name: dev
+    activation:
+      - kubeContext: docker-desktop
+    build:
+      tagPolicy:
+        sha256: {}
+    deploy:
+      helm:
+        releases:
+          - name: example
+            chartPath: example
+            valuesFiles:
+              - example/values/dev-values.yaml
+          - name: example-api
+            chartPath: api
+            valuesFiles:
+              - api/values/dev-values.yaml
+
+  - name: prod
+    build:
+      tagPolicy:
+        gitCommit: {}
+    deploy:
+      helm:
+        releases:
+          - name: example
+            chartPath: example
+            valuesFiles:
+              - example/values/prod-values.yaml
+          - name: example-api
+            chartPath: api
+            valuesFiles:
+              - api/values/prod-values.yaml

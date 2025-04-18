@@ -1,0 +1,43 @@
+# Default values for frontend application
+replicaCount: 1
+
+image:
+  repository: k3d-registry.localhost:5555/example
+  tag: latest
+  pullPolicy: Never
+
+source:
+  repoURL: https://github.com/kindasimple/k8-example.git
+  targetRevision: HEAD
+  path: deploy/example
+
+destination:
+  server: https://kubernetes.default.svc
+  namespace: default
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  host: example.localhost
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+nodeSelector: {}
+
+affinity: {}
+
+tolerations: []
+
